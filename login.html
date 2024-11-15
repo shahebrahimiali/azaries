@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('86CE5EA9-0DFD-4AC1-A990-AF9CDD56929F.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #333;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .login-logo {
+            display: block;
+            width: 240px;
+            margin: 0 auto 20px auto;
+        }
+        .login-header {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .login-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .login-button {
+            display: inline-block;
+            width: 100px;
+            height: 40px;
+            background-color: #0078D7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .login-button:hover {
+            background-color: #005a9e;
+        }
+        .success-message {
+            color: green;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .extra-links {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #0078D7;
+            text-align: center;
+        }
+        .extra-links a {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            margin: 5px 0;
+        }
+        .extra-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        const validEmail = "test@example.com";
+        const validPassword = "12345";
+
+        function validateLogin(event) {
+            event.preventDefault();
+
+            const emailInput = document.getElementById("email").value;
+            const passwordInput = document.getElementById("password").value;
+
+            const successMessage = document.getElementById("success-message");
+
+            if (emailInput === validEmail && passwordInput === validPassword) {
+                successMessage.textContent = "Login successful!";
+                successMessage.style.display = "block";
+
+                setTimeout(() => {
+                    window.location.href = "upload.html"; 
+                }, 1500);
+            } else {
+                alert("Invalid email or password. Please try again.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <img src="logo_fix.png" alt="Company Logo" class="login-logo">
+        <div class="login-header">Sign In</div>
+        <form onsubmit="validateLogin(event)">
+            <input type="email" id="email" placeholder="Enter your email" class="login-input" required>
+            <input type="password" id="password" placeholder="Enter your password" class="login-input" required>
+            <button type="submit" class="login-button">Sign In</button>
+        </form>
+        <p id="success-message" class="success-message" style="display: none;"></p>
+        <div class="extra-links">
+            <a href="signup.html">Don't have an account? Sign up</a>
+            <a href="reset-password.html">Forgot Username / Password?</a>
+        </div>
+    </div>
+</body>
+</html>

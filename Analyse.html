@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard with Multiple Charts</title>
+    <style>
+        /* Global styles */
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #800080; /* Purple background */
+            color: #fff; /* White text */
+            padding: 20px;
+            height: 100vh; /* Full viewport height */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Align at the top */
+        }
+        .intro-text {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60%; /* Take up 60% of the screen height */
+            text-align: left;
+            font-size: 12px;
+            line-height: 2;
+            margin-bottom: 20px;
+            color: #fff; /* White text */
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            flex-grow: 1; /* Make the dashboard take up remaining space */
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        /* Chart Containers */
+        .chart-container {
+            position: relative;
+            height: 250px; /* Increased height */
+            width: 100%;
+            margin-top: 15px;
+        }
+        /* Button styles */
+        .btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        /* Image styles */
+        .header-image {
+            display: block;
+            width: 240px;
+            margin: 0 auto 20px auto;
+        }
+    </style>
+    <!-- Include Chart.js and jsPDF -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- Header Image -->
+<img src="logo_fix.png" alt="Header Image" class="header-image">
+
+<!-- New "How It Works" Text Section -->
+<div class="intro-text">
+    <div>
+        <p><strong>How It Works:</strong></p>
+        <p><strong>Learning from the Past:</strong> Past market trends are analyzed to identify patterns that were profitable.</p>
+        <p><strong>Recognizing Familiar Situations:</strong> The current market is monitored for any similarities to these successful past patterns.</p>
+        <p><strong>Acting Only When It Sees a Match:</strong> Moves are made only if a match is detected between current market conditions and one of these profitable patterns from the past.</p>
+        <p>Thus, background knowledge functions as a smart checklist, aiding trading decisions by relying on lessons learned from past trades rather than on guesswork.</p>
+        <p>The market is studied using 34 different “formulas,” each examining details like the speed of price movements and fluctuations. At any time, the 12 best formulas suited to current market conditions are selected.</p>
+        <p>To enhance these formulas, “modifiers” are added to measure factors like market strength and momentum, ensuring adaptation to current trends. Actions are taken only when current market conditions align with past successful patterns, with “background knowledge” guiding these decisions.</p>
+        <p>The overall market “mood” is monitored for extreme highs or lows that may require adjustments. This layered approach has enabled informed, flexible trading choices, yielding an average 20% annual return over the past decade with consistent gains and minimal losses.</p>
+    </div>
+</div>
+
+<!-- Dashboard Section -->
+<div class="dashboard">
+    <!-- Revenue Updates with Bar Chart -->
+    <div class="card">
+        <h3>Revenue Updates</h3>
+        <p>Overview of Profit</p>
+        <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Sales Overview with Doughnut Chart -->
+    <div class="card">
+        <h3>Sales Overview</h3>
+        <div class="chart-container">
+            <canvas id="salesOverviewChart"></canvas>
+        </div>
+        <h1 style="text-align: center;">$678,117</h1>
+        <p style="text-align: center;">Profit: $61,839 | Expense: $87,975</p>
+    </div>
+
+    <!-- Monthly Earnings with Line Chart -->
+    <div class="card">
+        <h3>Monthly Earnings</h3>
+        <div class="chart-container">
+            <canvas id="monthlyEarningsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Yearly Sales with Bar Chart -->
+    <div class="card">
+        <h3>Yearly Sales</h3>
+        <div class="chart-container">
+            <canvas id="yearlySalesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Cash Flow Analysis with Line Chart -->
+    <div class="card">
+        <h3>Cash Flow Analysis</h3>
+        <div class="chart-container">
+            <canvas id="cashFlowChart" width="600" height="400"></canvas>
+        </div>
+    </div>
+
+    <!-- Investment Portfolio with Pie Chart -->
+    <div class="card">
+        <h3>Investment Portfolio</h3>
+        <div class="chart-container">
+            <canvas id="investmentPortfolioChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- Download Report Button -->
+<button class="btn" id="downloadReportBtn">Download Report</button>
+
+<script>
+    // Revenue Updates - Bar Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            datasets: [
+                {
+                    label: 'Footware',
+                    data: [3.2, 2.1, 3.8, 2.5, 3.0],
+                    backgroundColor: 'rgba(255, 223, 0, 0.7)', // Gold
+                    borderColor: 'rgba(255, 223, 0, 1)', // Gold
+                    borderWidth: 1
+                },
+                {
+                    label: 'Fashionware',
+                    data: [-2.4, -1.9, 1.1, 1.7, 2.9],
+                    backgroundColor: 'rgba(128, 0, 128, 0.7)', // Purple
+                    borderColor: 'rgba(128, 0, 128, 1)', // Purple
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Profit (in $1000s)' }
+                }
+            },
+            plugins: { legend: { display: true, position: 'top' } }
+        }
+    });
+
+    // Sales Overview - Doughnut Chart
+    const salesOverviewCtx = document.getElementById('salesOverviewChart').getContext('2d');
+    new Chart(salesOverviewCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Profit', 'Expense'],
+            datasets: [{
+                data: [61.839, 87.975],
+                backgroundColor: ['#FFD700', '#800080'], // Gold and Purple
+                borderColor: ['#FFD700', '#800080'],
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: true, position: 'bottom' } } }
+    });
+
+    // Monthly Earnings - Line Chart with more purple
+    const monthlyEarningsCtx = document.getElementById('monthlyEarningsChart').getContext('2d');
+    new Chart(monthlyEarningsCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            datasets: [{
+                label: 'Monthly Earnings',
+                data: [5.0, 6.2, 5.8, 6.5, 7.1],
+                backgroundColor: 'rgba(128, 0, 128, 0.2)', // Light Purple fill
+                borderColor: 'rgba(128, 0, 128, 1)', // Purple border
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Earnings (in $1000s)' }
+                }
+            },
+            plugins: { legend: { display: true, position: 'top' } }
+        }
+    });
+
+    // Yearly Sales - Bar Chart
+    const yearlySalesCtx = document.getElementById('yearlySalesChart').getContext('2d');
+    new Chart(yearlySalesCtx, {
+        type: 'bar',
+        data: {
+            labels: ['2019', '2020', '2021', '2022', '2023'],
+            datasets: [{
+                label: 'Yearly Sales',
+                data: [150, 180, 160, 200, 220],
+                backgroundColor: 'rgba(255, 223, 0, 0.7)', // Gold
+                borderColor: 'rgba(255, 223, 0, 1)', // Gold
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Sales (in $1000s)' }
+                }
+            },
+            plugins: { legend: { display: true, position: 'top' } }
+        }
+    });
+
+    // Cash Flow Analysis - Line Chart
+    const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
+    new Chart(cashFlowCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            datasets: [
+                {
+                    label: 'Cash Inflows',
+                    data: [7000, 8000, 7500, 7800, 8200],
+                    borderColor: 'blue',
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Cash Outflows',
+                    data: [5000, 6000, 5500, 5600, 5800],
+                    borderColor: 'red',
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Net Cash Flow',
+                    data: [2000, 2000, 2000, 2200, 2400],
+                    borderColor: 'green',
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Amount (in $)' }
+                }
+            }
+        }
+    });
+
+    // Investment Portfolio - Pie Chart
+    const investmentPortfolioCtx = document.getElementById('investmentPortfolioChart').getContext('2d');
+    new Chart(investmentPortfolioCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Stocks', 'Bonds', 'Real Estate'],
+            datasets: [{
+                data: [350000, 200000, 195000],
+                backgroundColor: ['#FFD700', '#800080', '#4CAF50'],
+                borderColor: ['#FFD700', '#800080', '#4CAF50'],
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'top' } } }
+    });
+
+    // Download Report Button Logic
+    document.getElementById('downloadReportBtn').addEventListener('click', function () {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text('Cash Flow Analysis Report', 10, 10);
+        doc.text('Date: ' + new Date().toLocaleDateString(), 10, 20);
+        doc.text('Report content goes here...', 10, 30);
+        doc.save('report.pdf');
+    });
+</script>
+
+</body>
+</html>

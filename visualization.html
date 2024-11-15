@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Candlestick Chart with Fibonacci Levels</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #candlestick-chart {
+            width: 100%;
+            max-width: 1200px;
+            height: 600px;
+            margin: 20px 0;
+        }
+        /* Floating Analyse Button */
+        .analyse-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #6a0dad;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease;
+        }
+        .analyse-button:hover {
+            background-color: #5a0bad;
+        }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h2>Interactive Candlestick Chart with Fibonacci Levels and Moving Average</h2>
+    <div id="candlestick-chart"></div>
+
+    <button class="analyse-button" onclick="goToAnalyse()">Analyse</button>
+
+    <script>
+        // Navigate to the Analyse.html page
+        function goToAnalyse() {
+            window.location.href = "Analyse.html";
+        }
+
+        // Data for the candlestick chart
+        const dates = Array.from({ length: 60 }, (_, i) => new Date(2023, 0, i + 1).toISOString().split('T')[0]);
+        const openPrices = Array.from({ length: 60 }, () => Math.random() * 10 + 100);
+        const closePrices = openPrices.map(o => o + (Math.random() - 0.5) * 5);
+        const highPrices = openPrices.map((o, i) => Math.max(o, closePrices[i]) + Math.random() * 3);
+        const lowPrices = openPrices.map((o, i) => Math.min(o, closePrices[i]) - Math.random() * 3);
+
+        // Compute moving average
+        const movingAverage = closePrices.map((_, i, arr) => {
+            if (i < 10) return null;
+            const sum = arr.slice(i - 10, i).reduce((acc, price) => acc + price, 0);
+            return sum / 10;
+        });
+
+        // Compute Fibonacci levels
+        const maxPrice = Math.max(...closePrices);
+        const minPrice = Math.min(...closePrices);
+        const fibLevels = [0.236, 0.382, 0.5, 0.618, 0.786].map(level => maxPrice - (maxPrice - minPrice) * level);
+
+        // Candlestick trace
+        const candlestickTrace = {
+            x: dates,
+            open: openPrices,
+            high: highPrices,
+            low: lowPrices,
+            close: closePrices,
+            type: 'candlestick',
+            name: 'Candlestick'
+        };
+
+        // Moving average trace
+        const movingAverageTrace = {
+            x: dates,
+            y: movingAverage,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Moving Average (10)',
+            line: { color: 'blue', width: 1.5 }
+        };
+
+        // Fibonacci levels traces
+        const fibonacciTraces = fibLevels.map((level, i) => ({
+            x: [dates[0], dates[dates.length - 1]],
+            y: [level, level],
+            type: 'scatter',
+            mode: 'lines',
+            line: { dash: 'dash', color: 'red' },
+            name: `Fibonacci ${[0.236, 0.382, 0.5, 0.618, 0.786][i]}`
+        }));
+
+        // Chart layout
+        const layout = {
+            title: 'Advanced Candlestick Chart with Fibonacci Levels and Moving Average',
+            xaxis: { title: 'Date' },
+            yaxis: { title: 'Price' },
+            showlegend: true
+        };
+
+        // Render the chart
+        Plotly.newPlot('candlestick-chart', [candlestickTrace, movingAverageTrace, ...fibonacciTraces], layout);
+    </script>
+</body>
+</html>

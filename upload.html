@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-File Upload with Visualization</title>
+  <style>
+    /* Reset styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Background and centering */
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('86CE5EA9-0DFD-4AC1-A990-AF9CDD56929F.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Upload container */
+    .upload-container {
+      max-width: 600px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    /* Header with SVG */
+    .upload-header {
+      font-size: 24px;
+      color: #6a0dad;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    /* Drop zone styling */
+    .drop-zone {
+      border: 2px dashed #6a0dad;
+      border-radius: 10px;
+      padding: 40px;
+      margin-bottom: 20px;
+      background-color: rgba(240, 240, 240, 0.8);
+      color: #6a0dad;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 18px;
+    }
+
+    .drop-zone.dragover {
+      background-color: #f3e5ff;
+    }
+
+    /* Hidden input */
+    .file-input {
+      display: none;
+    }
+
+    /* File list display */
+    .file-list {
+      margin-top: 15px;
+      text-align: left;
+      font-size: 14px;
+      color: #333333;
+    }
+
+    /* File item */
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    /* Delete button */
+    .delete-btn {
+      padding: 4px 8px;
+      color: white;
+      background-color: #d9534f;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .delete-btn:hover {
+      background-color: #c9302c;
+    }
+
+    /* Progress bar container */
+    .progress-container {
+      width: 100%;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    /* Progress bar styling */
+    .progress-bar {
+      height: 15px;
+      width: 0%;
+      background-color: #6a0dad;
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+
+    /* Submit button */
+    .submit-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 24px;
+      color: white;
+      background-color: #6a0dad;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .submit-button:hover {
+      background-color: #5a0bad;
+    }
+
+    .submit-icon {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+
+    /* Success message */
+    .success-message {
+      color: green;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    /* Visualization button */
+    .visualization-button {
+      display: none;
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      color: white;
+      background-color: #28a745;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .visualization-button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="upload-container">
+    <div class="upload-header">
+      <svg xmlns="http://www.w3.org/2000/svg" class="upload-icon" fill="#6a0dad" viewBox="0 0 16 16" width="24" height="24">
+        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+        <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+      </svg>
+      Please Upload Your Files
+    </div>
+    
+    <!-- Drop Zone -->
+    <div class="drop-zone" id="drop-zone">
+      Drag & Drop your files here or click to select
+    </div>
+
+    <!-- Hidden Input for File Selection -->
+    <input type="file" id="file-input" class="file-input" multiple>
+
+    <!-- File List -->
+    <div class="file-list" id="file-list">No files chosen</div>
+
+    <!-- Progress bar container -->
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- Submit Button -->
+    <button class="submit-button" id="submit-button">
+      Submit
+    </button>
+
+    <p id="success-message" class="success-message"></p>
+
+    <!-- Visualization Button -->
+    <button id="visualization-button" class="visualization-button" onclick="navigateToVisualization()">Visualization</button>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const fileListContainer = document.getElementById('file-list');
+    const progressBar = document.getElementById('progress-bar');
+    const submitButton = document.getElementById('submit-button');
+    const successMessage = document.getElementById('success-message');
+    const visualizationButton = document.getElementById('visualization-button');
+
+    let files = [];
+
+    // Handle file selection
+    function handleFileSelect(event) {
+      const selectedFiles = Array.from(event.target.files);
+      selectedFiles.forEach((file) => {
+        if (!files.some(f => f.name === file.name && f.size === file.size)) {
+          files.push(file);
+        }
+      });
+      renderFileList();
+    }
+
+    // Render file list
+    function renderFileList() {
+      fileListContainer.innerHTML = '';
+      files.forEach((file, index) => displayFileItem(file, index));
+    }
+
+    // Display each file
+    function displayFileItem(file, index) {
+      const fileItem = document.createElement('div');
+      fileItem.classList.add('file-item');
+      fileItem.innerHTML = `
+        <span>${file.name} (${formatFileSize(file.size)})</span>
+        <button class="delete-btn" onclick="deleteFile(${index})">Delete</button>
+      `;
+      fileListContainer.appendChild(fileItem);
+    }
+
+    // Format file size
+    function formatFileSize(size) {
+      return size < 1024 * 1024
+        ? (size / 1024).toFixed(2) + ' KB'
+        : (size / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    // Delete file
+    function deleteFile(index) {
+      files.splice(index, 1);
+      renderFileList();
+    }
+
+    // Simulate upload progress
+    function startUpload() {
+      let progress = 0;
+      const interval = setInterval(() => {
+        if (progress >= 100) {
+          clearInterval(interval);
+          successMessage.textContent = 'Submit successful!';
+          visualizationButton.style.display = 'inline-block';
+        } else {
+          progress += 10;
+          progressBar.style.width = `${progress}%`;
+        }
+      }, 300);
+    }
+
+    // Drag & Drop events
+    dropZone.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (event) => {
+      event.preventDefault();
+      dropZone.classList.remove('dragover');
+      fileInput.files = event.dataTransfer.files;
+      handleFileSelect(event);
+    });
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', handleFileSelect);
+
+    submitButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (files.length > 0) {
+        startUpload();
+      } else {
+        alert('Please select files to upload.');
+      }
+    });
+
+    function navigateToVisualization() {
+      window.location.href = 'visualization.html';
+    }
+  </script>
+
+</body>
+</html>
